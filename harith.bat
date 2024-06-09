@@ -44,7 +44,7 @@ if "%action%"=="pull" (
     REM Run Git commands for pull
     git pull
 
-    REM Run Docker commands for push
+    REM Run Docker commands for pull
     docker build -t %project_name% .
     docker tag %project_name% "anuragpsarmah/%project_name%"
     docker push "anuragpsarmah/%project_name%"
