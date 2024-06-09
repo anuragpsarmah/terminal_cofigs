@@ -1,37 +1,51 @@
 @echo off
-REM Check if the correct number of arguments is provided
-if "%~1"=="" (
-    echo Usage: harith {action} [project_name] [commit_message]
+
+REM Set the variables
+set action=%1
+set project_name=%2
+set commit_message=%3
+
+REM Check if no action is provided
+if "%action%"=="" (
+    echo Usage: harith <action> [project_name] [commit_message]
     echo Available actions: push, pull
     exit /b 1
 )
 
-REM Assign arguments to variables
-set action=%1
-shift
-
+REM Check the action and execute corresponding commands
 if "%action%"=="push" (
-    if "%~2"=="" (
+    REM Check if project name and commit message are provided for push
+    if "%project_name%"=="" (
         echo Usage: harith push {project_name} {commit_message}
         exit /b 1
     )
-    set project_name=%1
-    shift
-    set commit_message=%*
-) else if "%action%"=="pull" (
-    set project_name=
-    set commit_message=
-) else (
-    echo Invalid action. Available actions: push, pull
-    exit /b 1
+    if "%commit_message%"=="" (
+        echo Usage: harith push {project_name} {commit_message}
+        exit /b 1
+    )
+
+    REM Run Git commands for push
+    git add -A
+    git commit -m "%commit_message%"
+    git push
+
+    REM Run Docker commands for push
+    docker build -t %project_name% .
+    docker tag %project_name% "anuragpsarmah/%project_name%"
+    docker push "anuragpsarmah/%project_name%"
 )
+if "%action%"=="pull" (
+    REM Check if project name is provided for pull
+    if "%project_name%"=="" (
+        echo Usage: harith pull {project_name}
+        exit /b 1
+    )
 
-REM Run Git commands
-git add -A
-git commit -m "%commit_message%"
-git push
+    REM Run Git commands for pull
+    git pull
 
-REM Run Docker commands
-docker build -t %project_name% .
-docker tag %project_name% anuragpsarmah/%project_name%
-docker push anuragpsarmah/%project_name%
+    REM Run Docker commands for pull
+    docker build -t %project_name% .
+    docker tag %project_name% "anuragpsarmah/%project_name%"
+    docker push "anuragpsarmah/%project_name%"
+)

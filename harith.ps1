@@ -27,6 +27,11 @@ if ($action -eq "push") {
     docker push "anuragpsarmah/$project_name"
 }
 elseif ($action -eq "pull") {
+    if (-not $project_name) {
+        Write-Host "Usage: harith pull {project_name}"
+        exit 1
+    }
+
     # Run Git commands for pull
     git pull
 
